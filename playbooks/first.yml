@@ -1,0 +1,25 @@
+- name: Install common service playbook
+  hosts: worker1,worker2
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install common packages
+      apt:
+        name:
+          - nginx
+          - docker.io
+          - docker-compose
+          - fish
+          - neofetch
+        state: present
+
+    - name: Add SSH user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true

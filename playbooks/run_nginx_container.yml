@@ -1,0 +1,14 @@
+---
+- name: Run playbook container
+  hosts: worker2
+  vars: 
+    docker_image: "nginx:latest"
+  tasks:
+    - name: Run nginx container
+      community.docker.docker_container:
+        name: nginx_test_container
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "3000:80"
