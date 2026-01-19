@@ -2,9 +2,6 @@
   hosts: localhost
   become: true
 
-  vars: 
-    nfs_remote_dir: /srv/nfs_shared
-
   tasks:
     - name: Update cache
       apt: 
@@ -17,7 +14,7 @@
 
     - name: Create DIR to used
       file:
-        path: "{{ nfs_remote_dir }}"
+        path: "{{ nfs_server.mount_path }}"
         state: directory
         owner: nobody
         group: nogroup
@@ -27,7 +24,7 @@
     - name: Write config on /etc/exports
       lineinfile:
         path: /etc/exports
-        line: "{{ nfs_remote_dir }} *(rw,sync,no_subtree_check,no_root_squash)"
+        line: "{{ nfs_server.mount_path }} *(rw,sync,no_subtree_check,no_root_squash)"
         state: present
         create: yes
 

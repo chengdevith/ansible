@@ -1,0 +1,8 @@
+nfs_server:
+  mount_path: /srv/nfs_shared
+  ip: 10.148.0.3
+nfs_client:
+  mount_path: /mnt/nfs_shared
+  ip: 
+    - 10.148.0.5
+    - 10.148.0.6

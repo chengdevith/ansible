@@ -2,10 +2,6 @@
 - name: Setup NFS client
   hosts: worker1, worker2
   become: true
-  vars: 
-    nfs_remote_dir: /srv/nfs_shared
-    nfs_server_ip: 10.148.0.3
-    nfs_local_dir: /mnt/nfs_shared
   
   tasks:
     - name: Update cache
@@ -19,7 +15,7 @@
 
     - name: Create local mount dir
       file: 
-        path: "{{ nfs_local_dir }}"
+        path: "{{ nfs_client.mount_path }}"
         owner: nobody
         group: nogroup
         state: directory
@@ -27,15 +23,15 @@
 
     - name: Create mount point to remote dir
       mount:
-        src: "{{ nfs_server_ip }}:{{ nfs_remote_dir }}"
-        path: "{{ nfs_local_dir }}"
+        src: "{{ nfs_server.ip }}:{{ nfs_server.mount_path }}"
+        path: "{{ nfs_client.mount_path }}"
         fstype: nfs
         opts: default,_netdev
         state: mounted
     - name: Persist mount even after reboot
       mount:
-        src: "{{ nfs_server_ip }}:{{ nfs_remote_dir }}"
-        path: "{{ nfs_local_dir }}"
+        src: "{{ nfs_server.ip }}:{{ nfs_server.mount_path }}"
+        path: "{{ nfs_client.mount_path }}"
         fstype: nfs
         opts: default,_netdev
         state: present
