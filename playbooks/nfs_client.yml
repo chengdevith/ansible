@@ -28,6 +28,7 @@
         fstype: nfs
         opts: default,_netdev
         state: mounted
+
     - name: Persist mount even after reboot
       mount:
         src: "{{ nfs_server.ip }}:{{ nfs_server.mount_path }}"

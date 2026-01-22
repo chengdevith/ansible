@@ -1,0 +1,69 @@
+- name: Remove a single GCP instance
+  hosts: localhost
+  become: true
+
+  vars:
+    ssh_pub_path: "/home/enz/.ssh/id_rsa.pub"
+    machine_name: "iac-gcp-instance"
+    google_project_id: "project-c93ada48-4dd4-4a56-ab0"
+    service_account_path: "../credentials/ansibe-GCP-key.json"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Slurping the pub key and store in var
+      slurp: 
+        src: "{{ ssh_pub_path }}"
+      register: ssh_pub_key
+
+    - name: Install pip
+      apt:
+        name: python3-pip
+        state: present
+    
+    - name: Use pipe to install request and google-auth
+      pip:
+        name: 
+          - requests
+          - google-auth
+
+    - name: Remove GCP instance
+      google.cloud.gcp_compute_instance:
+          name: "{{machine_name}}"
+          machine_type: "e2-medium"
+          zone: "us-central1-a"
+          project: "{{google_project_id}}"
+          #auth_kind: application
+          auth_kind: "serviceaccount"
+          service_account_file: "{{ service_account_path }}"
+          state: absent
+          disks:
+            - auto_delete: true
+              boot: true
+              initialize_params:
+                source_image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
+                disk_size_gb: 15
+                disk_type: "pd-standard"
+          network_interfaces:
+            - network:
+                selfLink: "projects/{{google_project_id}}/global/networks/default"
+              access_configs:
+                - name: External NAT
+                  type: ONE_TO_ONE_NAT
+          tags:
+            items:
+              - http-server
+              - https-server
+      register: gcp_instance
+      when: true 
+          #environment: 
+            #GOOGLE_APPLICATION_CREDENTIALS: "{{ adc_file }}"
+            #GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES: "1"
+    - name: Write gcp_instance into json file
+      copy:
+        content: "{{ gcp_instance }}"
+        dest: "./gcp_instance.json"
+      when: true 

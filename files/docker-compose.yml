@@ -1,0 +1,29 @@
+services:
+  job-service-db:
+    image: mongo:7.0
+    container_name: job-service-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - /mnt/nfs_shared:/mnt/nfs_shared
+    networks:
+      - job-service-net
+
+  job-service:
+    image: benz3528/job-service
+    platform: linux/amd64 
+    container_name: job-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - job-service-db
+    environment:
+      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_URI}
+    volumes:
+      - /mnt/nfs_shared:/mnt/nfs_shared
+    networks:
+      - job-service-net
+networks:
+  job-service-net:
+    driver: bridge
