@@ -1,0 +1,12 @@
+---
+- name: Setting up infrastructure
+  hosts: local
+  become: true
+  vars_files:
+    - ../vars/machines.yml
+  tasks:
+    - name: Create master machines
+      include_tasks: "./task/create_master_task.yml"
+
+    - name: Create worker machines
+      include_tasks: "./task/create_worker_task.yml"
