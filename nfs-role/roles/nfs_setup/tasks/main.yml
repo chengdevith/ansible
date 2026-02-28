@@ -1,0 +1,12 @@
+# combining all playbook
+- name: Setup NFS Server
+  include_tasks: nfs_server.yml
+  when: nfs_mode == "server"
+  ignore_errors: false  
+  register: nfs_server_result
+
+- name: Setup NFS client
+  include_tasks: nfs_client.yml
+  when: 
+    - nfs_mode == "client"
+    - nfs_server_result is succeeded

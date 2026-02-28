@@ -1,0 +1,33 @@
+- name: Update cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install NFS client
+  apt:
+    name: nfs-common
+    state: present
+
+- name: Create local mount dir
+  file: 
+    path: "{{ nfs_client.mount_path }}"
+    owner: nobody
+    group: nogroup
+    state: directory
+    mode: "0777"
+
+- name: Create mount point to remote dir
+  mount:
+    src: "{{ nfs_server.ip }}:{{ nfs_server.mount_path }}"
+    path: "{{ nfs_client.mount_path }}"
+    fstype: nfs
+    opts: default,_netdev
+    state: mounted
+
+- name: Persist mount even after reboot
+  mount:
+    src: "{{ nfs_server.ip }}:{{ nfs_server.mount_path }}"
+    path: "{{ nfs_client.mount_path }}"
+    fstype: nfs
+    opts: default,_netdev
+    state: present

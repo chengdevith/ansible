@@ -1,0 +1,6 @@
+---
+roles:
+  - name: nfs_setup
+    src: https://github.com/chengdevith/ansible-role-nfs-setup.git
+    scm: git
+    version: master
